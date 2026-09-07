@@ -5,5 +5,6 @@ export function useGitHubRepos(user: string) {
   return useQuery({
     queryKey: ['github', 'repos', user],
     queryFn: () => fetchGitHubRepos(user),
+    enabled: user.length > 0,
   })
 }
