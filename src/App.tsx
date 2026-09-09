@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useGitHubRepos } from './hooks/useGitHubRepos'
 import { useWeather } from './hooks/useWeather'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './App.css'
 
 function App() {
@@ -42,6 +42,19 @@ function App() {
           {isError && <p>エラー：{error.message}</p>}
 
           {repos && (
+            <>
+              <ResponsiveContainer width="100%" height={240}>
+               <BarChart
+                 data={[...repos].sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 10)}
+                 margin={{ bottom: 40 }}
+               >
+                 <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} height={60} />
+                 <YAxis allowDecimals={false} />
+                 <Tooltip formatter={(value) => [value, 'Stars']} />
+                 <Bar dataKey="stargazers_count" fill="var(--accent)" />
+              </BarChart>
+            </ResponsiveContainer>
+
             <ul>
               {repos.map((repo) => (
                 <li key={repo.id}>
@@ -53,7 +66,8 @@ function App() {
                 </li>
               ))}
             </ul>
-          )}
+          </>
+        )}
         </section>
 
         <section className="card">
