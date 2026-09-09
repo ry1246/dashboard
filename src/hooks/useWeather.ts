@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchGeocoding, fetchCurrentWeather } from '../api/weather'
+import { fetchGeocoding, fetchCurrentWeather, fetchHourlyForecast } from '../api/weather'
 
 export function useWeather(city: string) {
   const geocoding = useQuery({
@@ -16,5 +16,11 @@ export function useWeather(city: string) {
     enabled: location != null,
   })
 
-  return { geocoding, weather }
+  const hourly = useQuery({
+    queryKey: ['weather', 'hourly', location?.latitude, location?.longitude],
+    queryFn: () => fetchHourlyForecast(location!.latitude, location!.longitude),
+      enabled: location != null,
+  })
+
+  return { geocoding, weather, hourly }
 }

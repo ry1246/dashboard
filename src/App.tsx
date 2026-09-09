@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useGitHubRepos } from './hooks/useGitHubRepos'
 import { useWeather } from './hooks/useWeather'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './App.css'
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
 
   const [cityInput, setCityInput] = useState('')
   const [city, setCity] = useState('')
-  const { geocoding, weather } = useWeather(city)
+  const { geocoding, weather, hourly } = useWeather(city)
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -76,6 +77,21 @@ function App() {
             <p>
               {geocoding.data.name} ({geocoding.data.country}) : {weather.data.temperature}°C
             </p>
+          )}
+          {hourly.isLoading && <p>気温推移を取得中...</p>}
+          {hourly.isError && <p>エラー：{hourly.error.message}</p>}
+          {hourly.data && (
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={hourly.data}>
+                <XAxis dataKey="time" tickFormatter={(t: string) => t.slice(11, 16)} />
+                <YAxis unit="°C" />
+                <Tooltip
+                  labelFormatter={(label) => (typeof label === 'string' ? label.slice(11, 16): label)}
+                  formatter={(value) => [`${value}°C`, '気温']}
+                />
+                <Line type="monotone" dataKey="temperature" stroke="var(--accent)" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
           )}
         </section>
       </div>
